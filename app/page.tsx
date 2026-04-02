@@ -2,9 +2,14 @@
 import { useState, useCallback } from 'react'
 import { content, carers, type Lang } from './i18n'
 import styles from './page.module.css'
+import dynamic from 'next/dynamic'
+const MapView = dynamic(() => import('./MapView'), {
+  ssr: false,
+  loading: () => <div style={{height:'420px',background:'#1a2235',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',color:'#8892a4',fontSize:'14px'}}>🗺️ 지도 불러오는 중...</div>
+})
 
 type Step = 'emoji' | 'schedule' | 'verify' | 'done'
-type AppView = 'home' | 'register' | 'match' | 'reputation' | 'notify'
+type AppView = 'home' | 'register' | 'match' | 'map' | 'reputation' | 'notify'
 
 interface Profile {
   emoji: string; nickname: string; role: string; lang: string
@@ -88,6 +93,7 @@ export default function Home() {
   const [step, setStep] = useState<Step>('emoji')
   const [matchDone, setMatchDone] = useState(false)
   const [selCarer, setSelCarer] = useState<typeof MOCK[0]|null>(null)
+  const [mapCarer, setMapCarer] = useState<any>(null)
   const [stars, setStars] = useState(0)
   const [reviewDone, setReviewDone] = useState(false)
   const [notes, setNotes] = useState(['🦊 하늘여우님과 매칭이 완료됐습니다!','케어 포인트 +100P 적립!','새 리뷰 ★★★★★','신원 인증 완료 ✓'])
@@ -112,8 +118,8 @@ export default function Home() {
       <nav className={styles.nav}>
         <a className={styles.logo} onClick={()=>go('home')} style={{cursor:'pointer'}}>Care<span>Match</span></a>
         <div className={`${styles.navLinks} ${menuOpen?styles.navOpen:''}`}>
-          {(['register','match','reputation','notify'] as AppView[]).map((v,i) => (
-            <a key={v} onClick={()=>go(v)} style={{cursor:'pointer'}}>{[t.nav.find,t.nav.register,t.nav.community,t.nav.about][i]}</a>
+          {(['register','match','map','reputation','notify'] as AppView[]).map((v,i) => (
+            <a key={v} onClick={()=>go(v)} style={{cursor:'pointer'}}>{[t.nav.find,t.nav.register,lang==='ja'?'地図':'지도',t.nav.community,t.nav.about][i]}</a>
           ))}
         </div>
         <div className={styles.navRight}>
@@ -306,6 +312,60 @@ export default function Home() {
               <div className={styles.infoBox}>🔒 {lang==='ja'?'本名・連絡先はマッチング後に暗号化チャンネルでのみ共有':'본명·연락처는 매칭 확정 후 암호화 채널로만 공유'}</div>
               <div className={styles.btnRow}><button className={styles.btnOutline} onClick={()=>setSelCarer(null)}>{lang==='ja'?'閉じる':'닫기'}</button><button className={styles.btnPrimary} onClick={()=>{setNotes(n=>[`${selCarer.emoji} ${selCarer.nick} 매칭 요청 전송!`,...n]);setSelCarer(null);go('notify')}}>{lang==='ja'?'マッチングリクエスト':'매칭 요청 보내기'}</button></div>
             </div>}
+          </div>
+        </div>
+      )}
+
+      
+      {view==='map' && (
+        <div className={styles.appView}>
+          <div className={styles.appHdr}>
+            <button className={styles.backBtn} onClick={()=>go('home')}>← {lang==='ja'?'ホーム':'홈'}</button>
+            <h2 className={styles.appTitle}>{lang==='ja'?'地図で探す':'지도에서 찾기'}</h2>
+          </div>
+          <div className={styles.formWrap}>
+            <div className={styles.fCard}>
+              <h3 className={styles.fTitle}>{lang==='ja'?'🗺️ 서울·오사카 돌봄사 지도':'🗺️ 서울 · 오사카 돌봄사 지도'}</h3>
+              <p className={styles.fDesc}>{lang==='ja'?'マーカーをクリックすると詳細が表示されます。赤=ソウル、青緑=大阪':'마커를 클릭하면 상세 정보가 표시됩니다. 빨강=서울, 청록=오사카'}</p>
+              <div style={{display:'flex',gap:'12px',marginBottom:'12px',flexWrap:'wrap'}}>
+                <span style={{display:'flex',alignItems:'center',gap:'6px',fontSize:'12px',color:'var(--muted)'}}>
+                  <span style={{width:'12px',height:'12px',borderRadius:'50%',background:'#e94560',display:'inline-block'}}/>
+                  {lang==='ja'?'ソウル':'서울'} ({lang==='ja'?'5名':'5명'})
+                </span>
+                <span style={{display:'flex',alignItems:'center',gap:'6px',fontSize:'12px',color:'var(--muted)'}}>
+                  <span style={{width:'12px',height:'12px',borderRadius:'50%',background:'#14b8a6',display:'inline-block'}}/>
+                  {lang==='ja'?'大阪':'오사카'} ({lang==='ja'?'3名':'3명'})
+                </span>
+              </div>
+              <MapView lang={lang} onSelect={(c:any)=>setMapCarer(c)} />
+            </div>
+            {mapCarer && (
+              <div className={styles.fCard}>
+                <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'1rem'}}>
+                  <div style={{fontSize:'3rem'}}>{mapCarer.emoji}</div>
+                  <div>
+                    <h3 style={{fontSize:'16px',fontWeight:500,color:'var(--text)',marginBottom:'3px'}}>{mapCarer.nick}</h3>
+                    <p style={{fontSize:'13px',color:'var(--muted)'}}>{mapCarer.sub}</p>
+                    <div style={{display:'flex',gap:'5px',marginTop:'5px',flexWrap:'wrap'}}>
+                      {mapCarer.tags.map((tag:string,i:number)=><span key={i} className={styles.tag}>{tag}</span>)}
+                    </div>
+                  </div>
+                  <div style={{marginLeft:'auto',fontSize:'1.5rem',fontWeight:700,color:mapCarer.city==='seoul'?'#e94560':'#14b8a6'}}>{mapCarer.score}%</div>
+                </div>
+                <div className={styles.repBars}>
+                  {[['신뢰도','95'],['친절도','92'],['전문성','88'],['시간약속','97']].map(([l,v])=>(
+                    <div key={l} className={styles.repBar}><span className={styles.repLabel}>{l}</span><div className={styles.barBg}><div className={styles.barFill} style={{width:v+'%'}}/></div><span className={styles.repVal}>{(parseInt(v)/10).toFixed(1)}</span></div>
+                  ))}
+                </div>
+                <div className={styles.infoBox}>
+                  🗺️ {mapCarer.city==='seoul'?(lang==='ja'?'ソウル担当エリア':'서울 담당 지역'):(lang==='ja'?'大阪担当エリア':'오사카 담당 지역')} · 🔒 {lang==='ja'?'本名非公開':'본명 비공개'}
+                </div>
+                <div className={styles.btnRow}>
+                  <button className={styles.btnOutline} onClick={()=>setMapCarer(null)}>{lang==='ja'?'閉じる':'닫기'}</button>
+                  <button className={styles.btnPrimary} onClick={()=>{setNotes((n:string[])=>[`${mapCarer.emoji} ${mapCarer.nick} 매칭 요청 전송!`,...n]);setMapCarer(null);go('notify')}}>{lang==='ja'?'マッチングリクエスト':'매칭 요청 보내기'}</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
