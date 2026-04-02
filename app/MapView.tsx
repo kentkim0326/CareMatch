@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react'
 import type { Lang } from './i18n'
 
-interface Carer {
+export interface Carer {
   emoji: string
   nick: string
   sub: string
@@ -24,108 +24,112 @@ const CARERS: Carer[] = [
   { emoji:'🐺', nick:'늑대달빛', sub:'오사카 요도가와구', tags:['話し相手','食事介助'], score:85, lat:34.7335, lng:135.4920, city:'osaka' },
 ]
 
-interface MapViewProps {
-  lang: Lang
-  onSelect: (carer: Carer) => void
-}
+interface Props { lang: Lang; onSelect: (c: Carer) => void }
 
-export default function MapView({ lang, onSelect }: MapViewProps) {
-  const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstanceRef = useRef<any>(null)
-  const markersRef = useRef<any[]>([])
+export default function MapView({ lang, onSelect }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<any>(null)
 
   useEffect(() => {
-    if (!mapRef.current || mapInstanceRef.current) return
+    // Inject Leaflet CSS once
+    if (!document.getElementById('leaflet-css')) {
+      const link = document.createElement('link')
+      link.id = 'leaflet-css'
+      link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+    }
 
-    const initMap = async () => {
+    if (!containerRef.current || mapRef.current) return
+
+    let cancelled = false
+
+    const init = async () => {
       const L = (await import('leaflet')).default
-      await import('leaflet/dist/leaflet.css')
 
-      const map = L.map(mapRef.current!, {
-        center: [37.5665, 126.9780],
-        zoom: 6,
+      // Fix default marker icon path issue in Next.js
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      })
+
+      if (cancelled || !containerRef.current) return
+
+      const map = L.map(containerRef.current, {
+        center: [36.5, 131.0],
+        zoom: 5,
         zoomControl: true,
+        scrollWheelZoom: false,
       })
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
         maxZoom: 18,
       }).addTo(map)
 
-      mapInstanceRef.current = map
+      mapRef.current = map
 
       CARERS.forEach(carer => {
+        const color = carer.city === 'seoul' ? '#e94560' : '#14b8a6'
         const icon = L.divIcon({
           className: '',
-          html: `<div style="
-            background: ${carer.city === 'seoul' ? '#e94560' : '#14b8a6'};
-            color: white;
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            cursor: pointer;
-          "><span style="transform:rotate(45deg)">${carer.emoji}</span></div>`,
-          iconSize: [40, 40],
-          iconAnchor: [20, 40],
-          popupAnchor: [0, -44],
+          html: `<div style="width:44px;height:44px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;font-size:20px;border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.35);cursor:pointer"><span style="transform:rotate(45deg);line-height:1">${carer.emoji}</span></div>`,
+          iconSize: [44, 44],
+          iconAnchor: [22, 44],
+          popupAnchor: [0, -48],
         })
 
-        const marker = L.marker([carer.lat, carer.lng], { icon })
-          .addTo(map)
-          .bindPopup(`
-            <div style="font-family:sans-serif;min-width:180px;padding:4px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:24px">${carer.emoji}</span>
-                <div>
-                  <div style="font-weight:600;font-size:14px">${carer.nick}</div>
-                  <div style="font-size:12px;color:#666">${carer.sub}</div>
-                </div>
-                <div style="margin-left:auto;font-weight:700;color:${carer.city==='seoul'?'#e94560':'#14b8a6'};font-size:15px">${carer.score}%</div>
+        const popup = L.popup({ maxWidth: 220, className: 'cm-popup' }).setContent(`
+          <div style="font-family:system-ui,sans-serif;padding:2px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <span style="font-size:28px">${carer.emoji}</span>
+              <div style="flex:1">
+                <div style="font-weight:600;font-size:14px;color:#111">${carer.nick}</div>
+                <div style="font-size:12px;color:#666;margin-top:1px">${carer.sub}</div>
               </div>
-              <div style="display:flex;gap:4px;flex-wrap:wrap">
-                ${carer.tags.map(t => `<span style="padding:2px 8px;background:#f0f0f0;border-radius:4px;font-size:11px">${t}</span>`).join('')}
-              </div>
+              <div style="font-size:16px;font-weight:700;color:${color}">${carer.score}%</div>
             </div>
-          `)
+            <div style="display:flex;gap:4px;flex-wrap:wrap">
+              ${carer.tags.map(t => `<span style="padding:3px 8px;background:${color}22;color:${color};border-radius:20px;font-size:11px;font-weight:500">${t}</span>`).join('')}
+            </div>
+          </div>
+        `)
 
-        marker.on('click', () => onSelect(carer))
-        markersRef.current.push(marker)
+        L.marker([carer.lat, carer.lng], { icon })
+          .addTo(map)
+          .bindPopup(popup)
+          .on('click', () => onSelect(carer))
       })
 
-      const seoulGroup = L.featureGroup(
-        markersRef.current.filter((_, i) => CARERS[i].city === 'seoul')
-      )
-      const osakaGroup = L.featureGroup(
-        markersRef.current.filter((_, i) => CARERS[i].city === 'osaka')
-      )
-
-      const bounds = L.latLngBounds([
-        [seoulGroup.getBounds().getCenter().lat, seoulGroup.getBounds().getCenter().lng],
-        [osakaGroup.getBounds().getCenter().lat, osakaGroup.getBounds().getCenter().lng],
-      ])
-      map.fitBounds(bounds.pad(0.4))
+      // Fit bounds to show both cities
+      const allPoints: [number,number][] = CARERS.map(c => [c.lat, c.lng])
+      map.fitBounds(L.latLngBounds(allPoints).pad(0.15))
     }
 
-    initMap()
+    init()
 
     return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove()
-        mapInstanceRef.current = null
+      cancelled = true
+      if (mapRef.current) {
+        mapRef.current.remove()
+        mapRef.current = null
       }
     }
-  }, [onSelect])
+  }, []) // eslint-disable-line
 
   return (
     <div
-      ref={mapRef}
-      style={{ width: '100%', height: '420px', borderRadius: '12px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}
+      ref={containerRef}
+      style={{
+        width: '100%',
+        height: '440px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        border: '1px solid rgba(255,255,255,0.1)',
+        background: '#1a2235',
+      }}
     />
   )
 }
-
-export type { Carer }

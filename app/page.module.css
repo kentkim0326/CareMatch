@@ -239,3 +239,7 @@
   .slotGrid{grid-template-columns:repeat(2,1fr)}
   .heroTitle{font-size:2.2rem}
 }
+
+/* ── NAV BUTTON FIX ─────────────────────── */
+.navBtn{background:none;border:none;padding:0;font-size:.88rem;color:var(--muted);cursor:pointer;transition:color .2s;font-family:inherit}
+.navBtn:hover{color:var(--text)}

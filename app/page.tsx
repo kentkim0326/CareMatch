@@ -118,9 +118,11 @@ export default function Home() {
       <nav className={styles.nav}>
         <a className={styles.logo} onClick={()=>go('home')} style={{cursor:'pointer'}}>Care<span>Match</span></a>
         <div className={`${styles.navLinks} ${menuOpen?styles.navOpen:''}`}>
-          {(['register','match','map','reputation','notify'] as AppView[]).map((v,i) => (
-            <a key={v} onClick={()=>go(v)} style={{cursor:'pointer'}}>{[t.nav.find,t.nav.register,lang==='ja'?'地図':'지도',t.nav.community,t.nav.about][i]}</a>
-          ))}
+          <button className={styles.navBtn} onClick={()=>go('register')}>{t.nav.find}</button>
+          <button className={styles.navBtn} onClick={()=>go('match')}>{t.nav.register}</button>
+          <button className={styles.navBtn} onClick={()=>go('map')}>{lang==='ja'?'🗺️ 地図':'🗺️ 지도'}</button>
+          <button className={styles.navBtn} onClick={()=>go('reputation')}>{t.nav.community}</button>
+          <button className={styles.navBtn} onClick={()=>go('notify')}>{t.nav.about}</button>
         </div>
         <div className={styles.navRight}>
           <div className={styles.langSwitch}>
