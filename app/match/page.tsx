@@ -3,36 +3,65 @@
 import { useState } from 'react';
 import styles from '../page.module.css';
 
-export default function MatchPage() {
-  const [lang, setLang] = useState<'ko'|'ja'>('ko');
-  const [connected, setConnected] = useState<number[]>([]);
+const EMOJIS = ['😊','🌸','🍀','⭐','🦋','🌙','🐣','🌿','🎵','🌊','🍁','🦊'];
 
-  const carers = [
-    { id:1, emoji:'🌸', score:98, name: lang==='ko'?'김○○ 님':'キム○○ さん',
-      sub: lang==='ko'?'서울 · 10년 경력 · 한·일 가능':'ソウル · 10年経験 · 韓日対応',
-      tags: lang==='ko'?['치매 전문','이중언어','야간 가능']:['認知症専門','バイリンガル','夜間対応'],
-      review: lang==='ko'?'어머니가 일본 분인데 정말 잘 소통해주셨어요.':'母が日本人ですがとても上手にコミュニケーションしてくれました。' },
-    { id:2, emoji:'🍀', score:96, name: lang==='ko'?'이○○ 님':'イ○○ さん',
-      sub: lang==='ko'?'경기 · 7년 경력 · 한국어':'京畿 · 7年経験 · 韓国語',
-      tags: lang==='ko'?['거동 보조','재활 보조','주간']:['移動介助','リハビリ補助','日中'],
-      review: '' },
-    { id:3, emoji:'⭐', score:99, name: lang==='ko'?'박○○ 님':'パク○○ さん',
-      sub: lang==='ko'?'서울 · 15년 경력 · 한·일 가능':'ソウル · 15年経験 · 韓日対応',
-      tags: lang==='ko'?['야간 케어','응급 대응','이중언어']:['夜間ケア','緊急対応','バイリンガル'],
-      review: lang==='ko'?'야간에 갑작스러운 상황도 침착하게 대처해 주셨어요.':'夜間の突然の状況にも冷静に対処していただきました。' },
-    { id:4, emoji:'🌿', score:94, name: lang==='ko'?'최○○ 님':'チェ○○ さん',
-      sub: lang==='ko'?'부산 · 8년 경력 · 한국어':'釜山 · 8年経験 · 韓国語',
-      tags: lang==='ko'?['치매 전문','말벗·정서','주간']:['認知症専門','傾聴サポート','日中'],
-      review: '' },
-    { id:5, emoji:'🎵', score:97, name: lang==='ko'?'田中○○ 님':'田中○○ さん',
-      sub: lang==='ko'?'도쿄 · 12년 경력 · 한·일 가능':'東京 · 12年経験 · 韓日対応',
-      tags: lang==='ko'?['이중언어','야간 가능','병원 동행']:['バイリンガル','夜間対応','通院同行'],
-      review: lang==='ko'?'한국어로 부드럽게 대화해 주셔서 어르신이 편안해하셨어요.':'韓国語で穏やかに話しかけてくださり、利用者の方が安心されていました。' },
-    { id:6, emoji:'🌊', score:93, name: lang==='ko'?'정○○ 님':'チョン○○ さん',
-      sub: lang==='ko'?'인천 · 5년 경력 · 한국어':'仁川 · 5年経験 · 韓国語',
-      tags: lang==='ko'?['가사 지원','식사 보조','주간']:['家事支援','食事介助','日中'],
-      review: '' },
-  ];
+export default function RegisterPage() {
+  const [lang, setLang] = useState<'ko'|'ja'>('ko');
+  const [step, setStep] = useState(0);
+  const [avatar, setAvatar] = useState(0);
+  const [nick, setNick] = useState('');
+  const [age, setAge] = useState('');
+  const [selLangs, setSelLangs] = useState<string[]>([]);
+  const [regions, setRegions] = useState<string[]>([]);
+  const [wdays, setWdays] = useState<number[]>([]);
+  const [slots, setSlots] = useState<string[]>([]);
+  const [skills, setSkills] = useState<string[]>([]);
+  const [intro, setIntro] = useState('');
+
+  const toggle = <T,>(arr: T[], val: T, set: (a:T[])=>void) =>
+    set(arr.includes(val)?arr.filter(x=>x!==val):[...arr,val]);
+
+  const ages   = lang==='ko'?['20대','30대','40대','50대','60대+']:['20代','30代','40代','50代','60代+'];
+  const langs  = ['한국어','日本語','English'];
+  const regs   = lang==='ko'
+    ?['서울','경기','부산','대구','인천','광주','대전','울산','제주','도쿄','오사카','교토']
+    :['ソウル','京畿','釜山','大邱','仁川','光州','大田','蔚山','済州','東京','大阪','京都'];
+  const wdayLabels = lang==='ko'?['월','화','수','목','금','토','일']:['月','火','水','木','金','土','日'];
+  const slotLabels = lang==='ko'?['06-09시','09-12시','12-15시','15-18시','18-21시','야간']:['06-09時','09-12時','12-15時','15-18時','18-21時','夜間'];
+  const skillList  = lang==='ko'
+    ?['치매 케어','거동 보조','식사 보조','투약 관리','재활 보조','말벗·정서','가사 지원','목욕 보조','병원 동행','야간 케어','이중언어','응급 대응']
+    :['認知症ケア','移動介助','食事介助','服薬管理','リハビリ補助','傾聴サポート','家事支援','入浴介助','通院同行','夜間ケア','バイリンガル','緊急対応'];
+
+  const canNext = [
+    !!(nick.trim() && age && selLangs.length>0),
+    regions.length>0,
+    wdays.length>0 && slots.length>0,
+    skills.length>0,
+  ][step];
+
+  if (step === 4) return (
+    <div className={styles.root}>
+      <nav className={styles.nav}>
+        <a href="/" className={styles.logo}>Care<span>Match</span></a>
+      </nav>
+      <div className={styles.doneWrap}>
+        <div className={styles.doneCard}>
+          <div className={styles.doneEmoji}>{EMOJIS[avatar]}</div>
+          <h3>{lang==='ko'?'등록이 완료되었습니다!':'登録が完了しました！'}</h3>
+          <p>{lang==='ko'?'검토 후 24시간 내 승인 알림을 드립니다.':'審査後、24時間以内に承認通知をお送りします。'}</p>
+          <div className={styles.ptsBadge}>
+            <span>{lang==='ko'?'케어포인트':'ケアポイント'}</span>
+            <strong>+50 pts</strong>
+            <em>{lang==='ko'?'+50 케어포인트 지급 예정':'+50 ケアポイント付与予定'}</em>
+          </div>
+          <div className={styles.btnRow}>
+            <a href="/match"><button className={styles.btnPrimary}>{lang==='ko'?'매칭 보러 가기 →':'マッチングを見る →'}</button></a>
+            <a href="/"><button className={styles.btnOutline}>{lang==='ko'?'홈으로':'ホームへ'}</button></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className={styles.root}>
@@ -47,56 +76,117 @@ export default function MatchPage() {
       </nav>
 
       <div className={styles.appHdr}>
-        <a href="/"><button className={styles.backBtn}>← {lang==='ko'?'홈':'ホーム'}</button></a>
-        <span className={styles.appTitle}>{lang==='ko'?'돌봄사 찾기':'介護士を探す'}</span>
+        {step>0
+          ?<button className={styles.backBtn} onClick={()=>setStep(s=>s-1)}>← {lang==='ko'?'뒤로':'戻る'}</button>
+          :<a href="/"><button className={styles.backBtn}>← {lang==='ko'?'홈':'ホーム'}</button></a>}
+        <span className={styles.appTitle}>{lang==='ko'?'돌봄사 등록':'介護士登録'} {step+1}/4</span>
+        <div className={styles.dots}>
+          {[0,1,2,3].map(i=>(
+            <div key={i} className={`${styles.dot} ${i<=step?styles.dotOn:''}`} />
+          ))}
+        </div>
       </div>
 
       <div className={styles.formWrap}>
-        <div className={styles.successBanner}>
-          {lang==='ko'
-            ?'검증된 돌봄사만 매칭됩니다 — 신분증 인증 + 범죄경력 조회 완료'
-            :'認証済み介護士のみマッチング — 身分証認証 + 犯罪歴照会済み'}
-        </div>
-
-        {carers.map(c => {
-          const isConn = connected.includes(c.id);
-          return (
-            <div key={c.id} className={styles.matchCard}>
-              <div className={styles.carerAvatar} style={{background:'rgba(233,69,96,0.12)'}}>
-                {c.emoji}
-              </div>
-              <div className={styles.carerInfo}>
-                <div className={styles.carerName}>{c.name}</div>
-                <div className={styles.carerSub}>{c.sub}</div>
-                <div className={styles.carerTags}>
-                  {c.tags.map(t=><span key={t} className={styles.tag}>{t}</span>)}
-                </div>
-                {c.review && (
-                  <div style={{fontSize:'12px',color:'var(--muted)',marginTop:'6px',lineHeight:1.6}}>
-                    💬 {c.review}
-                  </div>
-                )}
-              </div>
-              <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'8px',flexShrink:0}}>
-                <span className={styles.matchScore}>{c.score}%</span>
-                <button
-                  onClick={()=>setConnected(p=>isConn?p.filter(x=>x!==c.id):[...p,c.id])}
-                  style={{
-                    padding:'6px 12px',borderRadius:'8px',fontSize:'12px',fontWeight:500,
-                    border:isConn?'none':'1px solid var(--accent)',
-                    background:isConn?'rgba(20,184,166,0.15)':'transparent',
-                    color:isConn?'#14b8a6':'var(--accent)',
-                    cursor:'pointer',whiteSpace:'nowrap',
-                  }}
-                >
-                  {isConn
-                    ?(lang==='ko'?'요청 완료 ✓':'リクエスト完了 ✓')
-                    :(lang==='ko'?'연결 요청':'接続リクエスト')}
-                </button>
+        {step===0 && <>
+          <div className={styles.fCard}>
+            <p className={styles.fTitle}>{lang==='ko'?'프로필 아이콘 선택':'プロフィールアイコン選択'}</p>
+            <div className={styles.emojiGrid}>
+              {EMOJIS.map((e,i)=>(
+                <button key={i} className={`${styles.emojiOpt} ${avatar===i?styles.emojiSel:''}`} onClick={()=>setAvatar(i)}>{e}</button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.fCard}>
+            <div className={styles.fRow}>
+              <label>{lang==='ko'?'닉네임':'ニックネーム'}</label>
+              <input value={nick} onChange={e=>setNick(e.target.value)}
+                placeholder={lang==='ko'?'서비스 내 표시될 이름':'サービス内で表示される名前'} maxLength={12} />
+            </div>
+            <div className={styles.fRow}>
+              <label>{lang==='ko'?'연령대':'年齢層'}</label>
+              <div className={styles.filterRow}>
+                {ages.map(a=>(
+                  <button key={a} className={age===a?styles.filterOn:styles.filterBtn} onClick={()=>setAge(a)}>{a}</button>
+                ))}
               </div>
             </div>
-          );
-        })}
+            <div className={styles.fRow}>
+              <label>{lang==='ko'?'구사 언어':'話せる言語'}</label>
+              <div className={styles.filterRow}>
+                {langs.map(l=>(
+                  <button key={l} className={selLangs.includes(l)?styles.filterOn:styles.filterBtn}
+                    onClick={()=>toggle(selLangs,l,setSelLangs)}>{l}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>}
+
+        {step===1 && (
+          <div className={styles.fCard}>
+            <p className={styles.fTitle}>{lang==='ko'?'활동 지역':'活動地域'}</p>
+            <p className={styles.fDesc}>{lang==='ko'?'활동 가능한 지역을 모두 선택하세요':'活動可能な地域をすべて選択してください'}</p>
+            <div className={styles.filterRow} style={{flexWrap:'wrap'}}>
+              {regs.map(r=>(
+                <button key={r} className={regions.includes(r)?styles.filterOn:styles.filterBtn}
+                  onClick={()=>toggle(regions,r,setRegions)}>{r}</button>
+              ))}
+            </div>
+            {regions.length>0 && (
+              <div className={styles.infoBox}>{lang==='ko'?`선택: ${regions.join(', ')}`:`選択: ${regions.join(', ')}`}</div>
+            )}
+          </div>
+        )}
+
+        {step===2 && <>
+          <div className={styles.fCard}>
+            <p className={styles.fTitle}>{lang==='ko'?'활동 가능 요일':'活動可能な曜日'}</p>
+            <div className={styles.wdRow}>
+              {wdayLabels.map((d,i)=>(
+                <button key={i}
+                  className={`${styles.wdBtn} ${i===0?styles.wdSun:''} ${i===6?styles.wdSat:''} ${wdays.includes(i)?styles.wdOn:''}`}
+                  onClick={()=>toggle(wdays,i,setWdays)}>{d}</button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.fCard}>
+            <p className={styles.fTitle}>{lang==='ko'?'활동 가능 시간대':'活動可能な時間帯'}</p>
+            <div className={styles.slotGrid}>
+              {slotLabels.map(s=>(
+                <button key={s} className={`${styles.slot} ${slots.includes(s)?styles.slotOn:''}`}
+                  onClick={()=>toggle(slots,s,setSlots)}>{s}</button>
+              ))}
+            </div>
+          </div>
+        </>}
+
+        {step===3 && <>
+          <div className={styles.fCard}>
+            <p className={styles.fTitle}>{lang==='ko'?'전문 케어 분야':'専門ケア分野'}</p>
+            <div className={styles.filterRow} style={{flexWrap:'wrap'}}>
+              {skillList.map(s=>(
+                <button key={s} className={skills.includes(s)?styles.filterOn:styles.filterBtn}
+                  onClick={()=>toggle(skills,s,setSkills)}>{s}</button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.fCard}>
+            <div className={styles.fRow}>
+              <label>{lang==='ko'?'자기소개':'自己紹介'}</label>
+              <textarea value={intro} onChange={e=>setIntro(e.target.value)}
+                placeholder={lang==='ko'?'어르신을 돌보는 마음가짐이나 경력을 짧게 적어주세요.':'ご高齢の方へのケアの姿勢や経歴を簡単にご記入ください。'}
+                rows={4} maxLength={200} />
+            </div>
+            <p style={{fontSize:'12px',color:'var(--muted)',textAlign:'right'}}>{intro.length}/200</p>
+          </div>
+        </>}
+
+        <div className={styles.btnRow}>
+          <button className={styles.btnPrimary} disabled={!canNext} onClick={()=>setStep(s=>s+1)}>
+            {step===3?(lang==='ko'?'등록 완료':'登録完了'):(lang==='ko'?'다음':'次へ')}
+          </button>
+        </div>
       </div>
     </div>
   );
