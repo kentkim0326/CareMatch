@@ -1,0 +1,251 @@
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.langRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.langBtn {
+  padding: 4px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.langOn {
+  background: #fff;
+  color: #111827;
+  border-color: #374151;
+  font-weight: 500;
+}
+
+.progressBar {
+  height: 4px;
+  background: #f3f4f6;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #3b82f6;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.centerCard {
+  text-align: center;
+}
+
+.stepLabel {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.qTitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.qSub {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.chipSel {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #3b82f6;
+  font-weight: 500;
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover {
+  background: #2563eb;
+}
+
+.btnPrimary:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.15s;
+}
+
+.btnSecondary:hover {
+  background: #f3f4f6;
+}
+
+/* Loading dots */
+.dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 2rem 0 1rem;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: bounce 0.8s infinite;
+}
+
+.dot:nth-child(2) { animation-delay: 0.15s; }
+.dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-8px); }
+}
+
+/* Result */
+.sevBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.sev_low { background: #dcfce7; color: #166534; }
+.sev_mid { background: #fef9c3; color: #854d0e; }
+.sev_high { background: #fee2e2; color: #991b1b; }
+
+.resultLabel {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.resultText {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.divider {
+  height: 1px;
+  background: #f3f4f6;
+  margin: 1.25rem 0;
+}
+
+.actionCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.actionIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.actionTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.actionDesc {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.caregiverNote {
+  background: #eff6ff;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.caregiverNoteTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d4ed8;
+  margin-bottom: 4px;
+}
+
+.caregiverNoteBody {
+  font-size: 13px;
+  color: #1e40af;
+  line-height: 1.6;
+}
