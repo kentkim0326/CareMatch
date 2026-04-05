@@ -18,9 +18,9 @@ export default function Home() {
         <div className={`${styles.navLinks} ${menuOpen ? styles.navOpen : ''}`}>
           <a href="/match">{lang === 'ko' ? '돌봄사 찾기' : '介護士を探す'}</a>
           <a href="/register">{lang === 'ko' ? '등록하기' : '登録する'}</a>
-          <a href="#">{lang === 'ko' ? '🗺️ 지도' : '🗺️ 地図'}</a>
-          <a href="#">{lang === 'ko' ? '케어포인트' : 'ケアポイント'}</a>
-          <a href="#">{lang === 'ko' ? '소개' : '紹介'}</a>
+           <a href="/map">{lang === 'ko' ? '🗺️ 지도' : '🗺️ 地図'}</a>
+          <a href="/points">{lang === 'ko' ? '케어포인트' : 'ケアポイント'}</a>
+          <a href="/about">{lang === 'ko' ? '소개' : '紹介'}</a>
           <a href="/health" style={{color:'#14b8a6', fontWeight:500}}>
             {lang === 'ko' ? '케어헬스' : 'ケアヘルス'}
           </a>
