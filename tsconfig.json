@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2015",        // ← 기존 "es5" → "es2015" 로 변경
+    "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
