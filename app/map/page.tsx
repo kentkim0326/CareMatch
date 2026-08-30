@@ -41,9 +41,9 @@ export default function MapPage() {
         {/* 통계 */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'10px',marginBottom:'1.5rem'}}>
           {[
-            {val:'740+', label: lang==='ko'?'한국 활동':'韓国活動'},
-            {val:'360+', label: lang==='ko'?'일본 활동':'日本活動'},
-            {val:'12',   label: lang==='ko'?'도시':'都市'},
+            {val:'740+', label: lang==='ko'?'한국 활동 (예시)':'韓国活動（例示）'},
+            {val:'360+', label: lang==='ko'?'일본 활동 (예시)':'日本活動（例示）'},
+            {val:'12',   label: lang==='ko'?'도시 (예시)':'都市（例示）'},
           ].map(s=>(
             <div key={s.label} className={styles.ptsStat}>
               <span>{s.label}</span>

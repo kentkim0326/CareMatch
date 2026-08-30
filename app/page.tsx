@@ -96,6 +96,15 @@ export default function Home() {
           </div>
         ))}
       </div>
+      {/* 위 숫자는 달성한 실적이 아니라 서비스가 지향하는 목표다. */}
+      <div style={{
+        textAlign:'center', fontSize:'11.5px', color:'var(--muted)',
+        padding:'8px 16px', lineHeight:1.6,
+      }}>
+        {lang === 'ko'
+          ? '※ 위 숫자는 달성한 실적이 아니라 서비스가 지향하는 목표입니다.'
+          : '※ 上記の数値は達成した実績ではなく、サービスが目指す目標です。'}
+      </div>
 
       {/* ── HOW IT WORKS ── */}
       <section className={`${styles.section} ${styles.sectionDark}`}>

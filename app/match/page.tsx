@@ -54,8 +54,8 @@ export default function MatchPage() {
       <div className={styles.formWrap}>
         <div className={styles.successBanner}>
           {lang==='ko'
-            ?'검증된 돌봄사만 매칭됩니다 — 신분증 인증 + 범죄경력 조회 완료'
-            :'認証済み介護士のみマッチング — 身分証認証 + 犯罪歴照会済み'}
+            ?'아래는 예시 화면입니다. 실제 서비스에서는 신분증 인증과 범죄경력 조회를 거친 돌봄사만 매칭할 계획입니다.'
+            :'以下は例示画面です。実サービスでは身分証認証と犯罪歴照会を経た介護士のみマッチングする計画です。'}
         </div>
 
         {carers.map(c => {

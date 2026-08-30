@@ -6,19 +6,21 @@ import styles from '../page.module.css';
 export default function AboutPage() {
   const [lang, setLang] = useState<'ko'|'ja'>('ko');
 
+  // 디아더는 일인 개발사다. 없는 사람을 팀으로 세우지 않는다.
   const team = [
-    { emoji:'😊', ko:'김○○', ja:'キム○○', koRole:'CEO · 한일 복지 전문가', jaRole:'CEO · 日韓福祉専門家' },
-    { emoji:'🌿', ko:'이○○', ja:'イ○○',   koRole:'CTO · 풀스택 개발자',   jaRole:'CTO · フルスタック開発者' },
-    { emoji:'🌸', ko:'田中○○', ja:'田中○○', koRole:'COO · 일본 사업 총괄', jaRole:'COO · 日本事業統括' },
+    { emoji:'😊', ko:'김형섭 (Kent Kim)', ja:'キム・ヒョンソプ (Kent Kim)',
+      koRole:'디아더 대표 · 기획과 개발을 혼자 합니다',
+      jaRole:'Deother 代表 · 企画と開発を一人で行っています' },
   ];
 
+  // 지나간 일과 앞으로 할 일을 섞지 않는다. done:false 는 아직 하지 않은 것이다.
   const milestones = [
-    { year:'2024.03', ko:'CareMatch 아이디어 구상', ja:'CareMatchアイデア構想' },
-    { year:'2024.09', ko:'한일 파트너십 체결', ja:'日韓パートナーシップ締結' },
-    { year:'2025.01', ko:'베타 서비스 출시 (서울·도쿄)', ja:'ベータサービス開始（ソウル・東京）' },
-    { year:'2025.06', ko:'돌봄사 500명 돌파', ja:'介護士500名突破' },
-    { year:'2026.04', ko:'AI 케어헬스 기능 출시', ja:'AIケアヘルス機能リリース' },
-    { year:'2026.06', ko:'청년기업가대회 출품', ja:'青年起業家大会出品' },
+    { year:'2026.04', done:true,  ko:'CareMatch 기획 · 시안 제작', ja:'CareMatch企画・デザイン試作' },
+    { year:'2026.04', done:true,  ko:'AI 케어헬스 문진 화면 구현', ja:'AIケアヘルス問診画面の実装' },
+    { year:'2026.06', done:true,  ko:'글로벌 피우다프로젝트 출품', ja:'グローバル・ピウダプロジェクト出品' },
+    { year:'계획',    done:false, ko:'한일 파트너 기관 협의', ja:'日韓パートナー機関との協議' },
+    { year:'계획',    done:false, ko:'신분증 인증 · 범죄경력 조회 연동', ja:'身分証認証・犯罪歴照会の連携' },
+    { year:'계획',    done:false, ko:'베타 서비스 출시 (서울·도쿄)', ja:'ベータサービス開始（ソウル・東京）' },
   ];
 
   return (
@@ -73,13 +75,17 @@ export default function AboutPage() {
 
         {/* 마일스톤 */}
         <div className={styles.fCard} style={{marginBottom:'1rem'}}>
-          <p className={styles.fTitle}>{lang==='ko'?'성장 히스토리':'成長ヒストリー'}</p>
+          <p className={styles.fTitle}>{lang==='ko'?'진행 상황과 계획':'進捗と計画'}</p>
           {milestones.map((m,i)=>(
             <div key={i} className={styles.notifyItem}>
-              <div className={styles.notifyDot} style={{background: i===milestones.length-1?'#e94560':'#14b8a6'}} />
+              <div className={styles.notifyDot} style={{background: m.done?'#14b8a6':'#6b7280'}} />
               <div style={{flex:1}}>
-                <div style={{fontSize:'11px',color:'var(--muted)',marginBottom:'2px'}}>{m.year}</div>
-                <div style={{fontSize:'13px',color:'var(--text)'}}>{lang==='ko'?m.ko:m.ja}</div>
+                <div style={{fontSize:'11px',color:'var(--muted)',marginBottom:'2px'}}>
+                  {m.done ? m.year : (lang==='ko'?'계획':'計画')}
+                </div>
+                <div style={{fontSize:'13px',color: m.done?'var(--text)':'var(--muted)'}}>
+                  {lang==='ko'?m.ko:m.ja}{m.done ? '' : (lang==='ko'?' (예정)':'（予定）')}
+                </div>
               </div>
             </div>
           ))}
@@ -87,7 +93,7 @@ export default function AboutPage() {
 
         {/* 팀 */}
         <div className={styles.fCard} style={{marginBottom:'1rem'}}>
-          <p className={styles.fTitle}>{lang==='ko'?'팀':'チーム'}</p>
+          <p className={styles.fTitle}>{lang==='ko'?'만든 사람':'制作者'}</p>
           {team.map((t,i)=>(
             <div key={i} className={styles.matchCard}>
               <div className={styles.carerAvatar} style={{background:'rgba(233,69,96,0.12)',fontSize:'1.5rem'}}>
@@ -99,6 +105,11 @@ export default function AboutPage() {
               </div>
             </div>
           ))}
+          <div style={{fontSize:'11.5px',color:'var(--muted)',marginTop:'10px',lineHeight:1.6}}>
+            {lang==='ko'
+              ? '한일 돌봄 현장과 복지 제도를 아는 분들과 함께 만들고 싶습니다.'
+              : '日韓の介護現場と福祉制度をご存じの方と一緒に作りたいと考えています。'}
+          </div>
         </div>
 
         {/* CTA */}
